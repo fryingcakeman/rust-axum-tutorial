@@ -11,6 +11,7 @@ use std::sync::Arc;
 use tower_http::compression::CompressionLayer;
 
 #[derive(Clone, Debug)]
+#[allow(unused)]
 pub struct AppState {
     db: PgPool,
 }
@@ -40,7 +41,8 @@ async fn init_router() -> Router {
         .route("/", get(hello_world))
         .layer(CompressionLayer::new())
         .layer(middleware::from_fn(check_hello_world)) // 添加自定义middleware
-        .layer(middleware::from_fn_with_state( // 给中间件添加应用状态
+        .layer(middleware::from_fn_with_state(
+            // 给中间件添加应用状态
             state.clone(),
             check_hello_world,
         ))
@@ -48,4 +50,8 @@ async fn init_router() -> Router {
 }
 
 #[tokio::main]
-async fn main() {}
+async fn main() {
+    let app = init_router().await;
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    axum::serve(listener, app).await.unwrap();
+}

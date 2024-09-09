@@ -1,0 +1,12 @@
+[workspace]
+members = [
+    "axum-demo",
+    "axum-demo2",
+    "axum-demo3",
+    "axum-demo4",
+    "axum-demo5",
+    "axum-demo6",
+    "axum-demo7-webserver"
+]
+
+resolver = "2"

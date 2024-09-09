@@ -1,7 +1,8 @@
+use axum::routing::get;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json,
+    Json, Router,
 };
 use serde::Serialize;
 
@@ -10,6 +11,7 @@ struct Message {
     message: String,
 }
 
+#[allow(unused)]
 enum ApiResponse {
     OK,
     Created,
@@ -31,6 +33,7 @@ async fn do_something() -> ApiResponse {
     ApiResponse::OK
 }
 
+#[allow(unused)]
 enum ApiError {
     BadRequest,
     Forbidden,
@@ -56,7 +59,12 @@ async fn hey() -> Result<ApiResponse, ApiError> {
     Err(ApiError::InternalServerError)
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/hey", get(hey))
+        .route("/do", get(do_something));
 
-
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    axum::serve(listener, app).await.unwrap();
 }

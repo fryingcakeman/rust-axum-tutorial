@@ -2,18 +2,21 @@ use axum::extract::{FromRequest, Path, Query, Request};
 use axum::http::header::CONTENT_TYPE;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use axum::{async_trait, Form, Json, RequestExt};
+use axum::routing::get;
+use axum::{async_trait, Form, Json, RequestExt, Router};
 use axum_extra::headers::Origin;
 use axum_extra::TypedHeader;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug)]
+#[allow(unused)]
 struct User {
     id: i32,
     name: String,
 }
 
 /// 提取器extractor：从http请求中获取各种参数
+#[allow(unused)]
 async fn get_user(
     Json(user): Json<User>, // 如果传入User结构中没有的参数，将会被忽略
     Form(form): Form<User>,
@@ -25,6 +28,7 @@ async fn get_user(
 
 /// 处理Header需要用axum-extra包
 /// axum-extra还有处理cookie、protobuf等的功能
+#[allow(unused)]
 async fn my_handler(TypedHeader(origin): TypedHeader<Origin>) {
     println!("{}", origin)
 }
@@ -34,6 +38,7 @@ struct Payload {
     foo: String,
 }
 
+#[allow(unused)]
 async fn handler(JsonOrForm(payload): JsonOrForm<Payload>) {
     dbg!(payload);
 }
@@ -71,4 +76,11 @@ where
     }
 }
 
-fn main() {}
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/handler", get(handler))
+        .route("/myhandler", get(my_handler));
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    axum::serve(listener, app).await.unwrap();
+}
