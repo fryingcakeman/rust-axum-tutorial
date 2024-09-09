@@ -20,7 +20,7 @@ async fn hello_world() -> &'static str {
     "Hello world"
 }
 
-/// 实现字节的middleware
+/// 实现自己的middleware
 async fn check_hello_world(req: Request, next: Next) -> Result<Response, StatusCode> {
     if req.headers().get(CONTENT_TYPE).unwrap() != "application/json" {
         return Err(StatusCode::BAD_REQUEST);
